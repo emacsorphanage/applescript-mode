@@ -421,7 +421,6 @@ contain this package.")
 ;;  Support for outline.el
 (defun as-outline-level ()
   "This is so that `current-column` DTRT in otherwise-hidden text"
-  ;; patch from Dave Love <fx@gnu.org>
   (let (buffer-invisibility-spec)
     (save-excursion
       (back-to-indentation)
