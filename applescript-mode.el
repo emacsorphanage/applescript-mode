@@ -213,7 +213,6 @@ for a block opening statement are given this extra offset."
   (modify-syntax-entry ?&  "." as-mode-syntax-table)
   (modify-syntax-entry ?\|  "." as-mode-syntax-table)
   (modify-syntax-entry ?+  "." as-mode-syntax-table)
-  (modify-syntax-entry ?*  "." as-mode-syntax-table)
   (modify-syntax-entry ?/  "." as-mode-syntax-table)
   (modify-syntax-entry ?=  "." as-mode-syntax-table)
   (modify-syntax-entry ?<  "." as-mode-syntax-table)
@@ -235,8 +234,9 @@ for a block opening statement are given this extra offset."
   (modify-syntax-entry ?\n  ">   " as-mode-syntax-table)
 
   ;; define parentheses to match
-  (modify-syntax-entry ?\( "()" as-mode-syntax-table)
-  (modify-syntax-entry ?\) ")(" as-mode-syntax-table)
+  (modify-syntax-entry ?\( "()1" as-mode-syntax-table)
+  (modify-syntax-entry ?\) ")(4" as-mode-syntax-table)
+  (modify-syntax-entry ?*  ". 23b" as-mode-syntax-table)
   )
 
 ;; Utilities
