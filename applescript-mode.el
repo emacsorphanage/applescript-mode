@@ -40,10 +40,9 @@
 
 ;;; Usage:
 ;; To use applescript-mode.el put the following line in your .emacs:
-;; (autoload 'applescript-mode "applescript-mode" "major mode for editing AppleScript source." t)
-;; (setq auto-mode-alist
-;;      (cons '("\\.applescript$" . applescript-mode) auto-mode-alist)
-;;      )
+;; (autoload 'applescript-mode "applescript-mode"
+;;   "Major mode for editing AppleScript source." t)
+;; (add-to-list 'auto-mode-alist '("\\.applescript$" . applescript-mode))
 
 ;; Please use the SourceForge MacEmacs JP Project to submit bugs or
 ;; patches:
@@ -63,7 +62,7 @@
 
 ;; user customize variables
 (defgroup applescript nil
-  "Support for the AppleScript, <http://www.apple.com/applescript/>"
+  "Support for AppleScript, <http://www.apple.com/applescript/>"
   :group 'languages
   :prefix "as-")
 
@@ -113,46 +112,38 @@ for a block opening statement are given this extra offset."
   (or (face-differs-from-default-p 'as-pseudo-keyword-face)
       (copy-face 'font-lock-keyword-face 'as-pseudo-keyword-face))
   (or (face-differs-from-default-p 'as-command-face)
-      (copy-face 'font-lock-keyword-face 'as-command-face))
-  )
+      (copy-face 'font-lock-keyword-face 'as-command-face)))
 (add-hook 'font-lock-mode-hook 'as-font-lock-mode-hook)
 
 (defvar applescript-font-lock-keywords
   (let (
         ;; expressions and control Statements
-        (kw1 (mapconcat 'identity
-                        '("and" "app" "application" "considering" "div"
-                          "else" "end" "exit" "is" "mod" "not" "on" "or"
-                          "if" "ignoring" "reopen" "repeat"
-                          "tell" "then" "to"
-                          "using[ \t]terms[ \t]from"
-                          "with[ \t]timeout" "with[ \t]transaction"
-                          )
-                        "\\|"))
+        (kw1 (regexp-opt
+              '("and" "app" "application" "considering" "div"
+                "else" "end" "exit" "is" "mod" "not" "on" "or"
+                "if" "ignoring" "reopen" "repeat"
+                "tell" "then" "to"
+                "using[ \t]terms[ \t]from"
+                "with[ \t]timeout" "with[ \t]transaction")))
         ;; commands
-        (kw2 (mapconcat 'identity
-                        '("ASCII[ \t]character" "ASCII[ \t]number" "activate" "AGStart"
-                          "beep"  "copy" "count" "choose[ \t]application"
-                          "choose[ \t]file" "choose[ \t]folder" "close[ \t]access"
-                          "current[ \t]date" "display[ \t]dialog" "get" "get[ \t]EOF"
-                          "info[ \t]for" "launch" "list[ \t]disks" "list[ \t]folder"
-                          "load[ \t]script" "log" "monitor[ \t]depth" "max[ \t]monitor[ \t]depth"
-                          "min[ \t]monitor[ \t]depth" "new[ \t]file" "offset"
-                          "open[ \t]for[ \t]access" "path[ \t]to" "random[ \t]number"
-                          "read" "round" "run" "run[ \t]script" "scripting[ \t]component"
-                          "set" "set[ \t]EOF" "set[ \t]monitor[ \t]depth" "set[ \t]volume"
-                          "start[ \t]log" "stop[ \t]log" "store[ \t]script"
-                          "time[ \t]to[ \t]GMT" "write"
-                          )
-                        "\\|"))
+        (kw2 (regexp-opt
+              '("ASCII[ \t]character" "ASCII[ \t]number" "activate" "AGStart"
+                "beep"  "copy" "count" "choose[ \t]application"
+                "choose[ \t]file" "choose[ \t]folder" "close[ \t]access"
+                "current[ \t]date" "display[ \t]dialog" "get" "get[ \t]EOF"
+                "info[ \t]for" "launch" "list[ \t]disks" "list[ \t]folder"
+                "load[ \t]script" "log" "monitor[ \t]depth" "max[ \t]monitor[ \t]depth"
+                "min[ \t]monitor[ \t]depth" "new[ \t]file" "offset"
+                "open[ \t]for[ \t]access" "path[ \t]to" "random[ \t]number"
+                "read" "round" "run" "run[ \t]script" "scripting[ \t]component"
+                "set" "set[ \t]EOF" "set[ \t]monitor[ \t]depth" "set[ \t]volume"
+                "start[ \t]log" "stop[ \t]log" "store[ \t]script"
+                "time[ \t]to[ \t]GMT" "write")))
         ;; misc
-        (kw3 (mapconcat 'identity
-                        '("buttons" "default[ \t]answer" "default[ \t]button"
-                          "to[ \t]begining[ \t]of" "to[ \t]word" "starting[ \t]at"
-                          "with[ \t]icon" "write[ \t]permission"
-                          )
-                        "\\|"))
-        )
+        (kw3 (regexp-opt
+              '("buttons" "default[ \t]answer" "default[ \t]button"
+                "to[ \t]begining[ \t]of" "to[ \t]word" "starting[ \t]at"
+                "with[ \t]icon" "write[ \t]permission"))))
     (list
      ;; keywords
      (cons (concat "\\b\\(" kw1 "\\)\\b[ \n\t(]") 1)
@@ -166,9 +157,7 @@ for a block opening statement are given this extra offset."
        1 font-lock-function-name-face)
      ;; pseudo-keywords
      '("\\b\\(it\\|me\\|my\\|true\\|false\\)\\b"
-       1 as-pseudo-keyword-face)
-     )
-  ))
+       1 as-pseudo-keyword-face))))
 (put 'applescript-mode 'font-lock-defaults '(applescript-font-lock-keywords))
 
 ;; Major mode boilerplate
@@ -195,11 +184,7 @@ for a block opening statement are given this extra offset."
 
   ;; Miscellaneous
   (define-key as-mode-map "\C-c;" 'comment-region)
-  (define-key as-mode-map "\C-c:" 'uncomment-region)
-
-  ;; information
-  ;(define-key as-mode-map "\C-c\C-v" 'as-mode-version)
-  )
+  (define-key as-mode-map "\C-c:" 'uncomment-region))
 
 (defvar as-mode-syntax-table nil
   "Syntax table used in `applescript-mode' buffers.")
@@ -236,8 +221,7 @@ for a block opening statement are given this extra offset."
   ;; define parentheses to match
   (modify-syntax-entry ?\( "()1" as-mode-syntax-table)
   (modify-syntax-entry ?\) ")(4" as-mode-syntax-table)
-  (modify-syntax-entry ?*  ". 23b" as-mode-syntax-table)
-  )
+  (modify-syntax-entry ?*  ". 23b" as-mode-syntax-table))
 
 ;; Utilities
 (defmacro as-safe (&rest body)
@@ -280,11 +264,8 @@ This function does not modify point or mark."
      ((eq position 'eob) (end-of-buffer))
      ((eq position 'boi) (back-to-indentation))
      ((eq position 'bos) (as-goto-initial-line))
-     (t (error "Unknown buffer position requested: %s" position))
-     )
-    (prog1
-        (point)
-      (goto-char here))))
+     (t (error "Unknown buffer position requested: %s" position)))
+    (prog1 (point) (goto-char here))))
 
 ;; Menu definitions, only relevent if you have the easymenu.el package
 ;; (standard in the latest Emacs 19 and XEmacs 19 distributions).
@@ -306,8 +287,7 @@ contain this package.")
         ["Execute string"       as-execute-string t]
         "-"
         ["Mode Version"         as-mode-version t]
-        ["AppleScript Version"   as-language-version t]
-        )))
+        ["AppleScript Version"   as-language-version t])))
 
 ;;;###autoload
 (defun applescript-mode ()
@@ -346,8 +326,7 @@ contain this package.")
         comment-start "-- "
         comment-end   ""
         comment-start-skip "---*[ \t]*"
-        comment-column 40
-        )
+        comment-column 40)
 
   ;;  Support for outline-minor-mode
   (set (make-local-variable 'outline-regexp)
@@ -361,9 +340,7 @@ contain this package.")
   ;; Run the mode hook.  Note that applescript-mode-hook is deprecated.
   (if applescript-mode-hook
       (run-hooks 'applescript-mode-hook)
-    (run-hooks 'applescript-mode-hook))
-
-  )
+    (run-hooks 'applescript-mode-hook)))
 
 (when (not (or (rassq 'applescript-mode auto-mode-alist)
   (push '("\\.applescript$" . applescript-mode) auto-mode-alist))))
@@ -397,12 +374,12 @@ contain this package.")
         (as-current-win (selected-window)))
     (pop-to-buffer as-output-buffer)
     (insert (as-execute-code region))
-    (select-window as-current-win)
-    ))
+    (select-window as-current-win)))
 
 (defun as-execute-code (code)
   "pop to the AppleScript buffer, run the code and display the results."
-  (as-decode-string (do-applescript (as-string-to-sjis-string-with-escape code))))
+  (as-decode-string
+   (do-applescript (as-string-to-sjis-string-with-escape code))))
 
 (defun as-mode-version ()
   "Echo the current version of `applescript-mode' in the minibuffer."
@@ -413,7 +390,8 @@ contain this package.")
 (defun as-language-version()
   "Echo the current version of AppleScript Version in the minibuffer."
   (interactive)
-  (message "Using AppleScript version %s" (as-execute-code "AppleScript's version"))
+  (message "Using AppleScript version %s"
+           (as-execute-code "AppleScript's version"))
   (as-keep-region-active))
 
 ;; as-beginning-of-handler, as-end-of-handler,as-goto-initial-line not yet
