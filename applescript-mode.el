@@ -76,6 +76,11 @@
   :type 'string
   :group 'applescript)
 
+(defcustom as-osadecompile-command "osadecompile"
+  "*decompile AppleScripts and other OSA language scripts."
+  :type 'string
+  :group 'applescript)
+
 (defcustom as-osascript-command-args '("-ss")
   "*List of string arguments to be used when starting a osascript."
   :type '(repeat string)
@@ -95,6 +100,9 @@ Continuation sign terminated line.  Only those continuation lines
 for a block opening statement are given this extra offset."
   :type 'integer
   :group 'applescript)
+
+(defvar *applescript-mode-debug* nil 
+  "Print Applescript to message buffer before sending.")
 
 ;; Face Setting
 
@@ -184,7 +192,8 @@ for a block opening statement are given this extra offset."
 
   ;; Miscellaneous
   (define-key as-mode-map "\C-c;" 'comment-region)
-  (define-key as-mode-map "\C-c:" 'uncomment-region))
+  (define-key as-mode-map "\C-c:" 'uncomment-region)
+  (define-key as-mode-map (kbd "C-c RET") 'as-line-break))
 
 (defvar as-mode-syntax-table nil
   "Syntax table used in `applescript-mode' buffers.")
@@ -208,7 +217,7 @@ for a block opening statement are given this extra offset."
   (modify-syntax-entry ?\{ "." as-mode-syntax-table)
   (modify-syntax-entry ?\} "." as-mode-syntax-table)
   (modify-syntax-entry ?. "." as-mode-syntax-table)
-  (modify-syntax-entry ?\\ "." as-mode-syntax-table)
+  (modify-syntax-entry ?\\ "\\" as-mode-syntax-table)
   (modify-syntax-entry ?\' "." as-mode-syntax-table)
 
   ;; a double hyphen starts a comment
@@ -343,7 +352,8 @@ contain this package.")
     (run-hooks 'applescript-mode-hook)))
 
 (when (not (or (rassq 'applescript-mode auto-mode-alist)
-  (push '("\\.applescript$" . applescript-mode) auto-mode-alist))))
+  (push '("\\.applescript$" . applescript-mode) auto-mode-alist)
+  (push '("\\.scpt$" . applescript-mode) auto-mode-alist))))
 
 ;;; Subprocess commands
 
@@ -366,6 +376,14 @@ contain this package.")
                  (generate-new-buffer-name as-output-buffer)))
     (insert string)
     (as-execute-region (point-min) (point-max) async)))
+
+(defun as-execute-line (&optional async)
+  "Execute the current line as Applescript"
+  (interactive)
+  (let* ((bounds (bounds-of-thing-at-point 'line))
+         (p1 (first bounds))
+         (p2 (rest bounds)))
+    (as-execute-region p1 p2 async)))
 
 (defun as-execute-region (start end &optional async)
   "Execute the region as an Applescript"
@@ -460,6 +478,69 @@ contain this package.")
 
     ;; else
     (t (intern retstr))))
+
+(defun load-and-run-applescript (path &optional tokens)
+  "Load an Applescript file, replace any tokens with values and execute"
+  (interactive "fFile to load: ")
+  (with-temp-buffer
+    (insert-file-contents path)
+    (let ((includes '()))
+      (while (re-search-forward "^-- *require *\"\\\(.*\\\)\"" nil t)
+        (add-to-list 'includes (match-string 1) t))
+      (dolist (inc includes)
+        (let ((incpath (concat (file-name-directory path) inc)))
+          (when (file-exists-p incpath)
+            (insert-file-contents incpath)
+            (newline)))))
+    (when tokens
+      (if (listp tokens)
+          (dolist (tok tokens)
+            (save-excursion
+              (while (re-search-forward (first tok) nil t)
+                (replace-match (format "%s" (second tok)) t nil))))
+        (error "Invalid token alist.")))
+    (if *applescript-mode-debug*
+        (message "Applescript:\n%s" (buffer-string)))
+    (do-applescript (buffer-string))))
+
+(defun decompile-scpt ()
+  (if (string= (file-name-extension (buffer-file-name)) "scpt")
+      (let ((cmd (concat as-osadecompile-command " " 
+                         (shell-quote-argument (buffer-file-name)))))
+        (let ((script (shell-command-to-string cmd)))
+          (if (string= (substring script 0 14) "osadecompile: ")
+              (error "Invalid Applescript binary.")
+            (delete-region (point-min) (point-max))
+            (insert script))))))
+
+(defun compile-scpt ()
+  (if (string= (file-name-extension (buffer-file-name)) "scpt")
+      (let ((cmd (concat as-osacompile-command " -o " 
+                         (shell-quote-argument (buffer-file-name))
+                         " "
+                         (shell-quote-argument (buffer-file-name)))))
+        (message "cmd: %s" cmd)
+        (let ((result (shell-command-to-string cmd)))
+            (if (> (length result) 0)
+                (error "Error compiling Applescript: %s" result)
+              (message "Applescript compiled successfully."))))))
+
+(add-hook 'applescript-mode-hook 'decompile-scpt)
+(add-hook 'after-save-hook 'compile-scpt)
+
+(defun as-line-break ()
+  "Insert the Applescript line continuation character."
+  (interactive)
+  (if (not (= (char-before) 32))
+      (insert " "))
+  (insert "¬")
+  (newline))
+
+(defun as-quote (str)
+  (replace-regexp-in-string "\"" "\\\\\\\\\"" 
+                            (replace-regexp-in-string "\\\\" "\\\\\\\\" 
+                                                      str t) t))
+
 
 (provide 'applescript-mode)
 ;;; applescript-mode.el ends here
