@@ -397,7 +397,9 @@ contain this package.")
 (defun as-execute-code (code)
   "pop to the AppleScript buffer, run the code and display the results."
   (as-decode-string
-   (do-applescript (as-string-to-sjis-string-with-escape code))))
+   (let ((rval 
+         (do-applescript (as-string-to-sjis-string-with-escape code))))
+     (if (null rval) "" rval))))
 
 (defun as-mode-version ()
   "Echo the current version of `applescript-mode' in the minibuffer."
@@ -432,11 +434,10 @@ contain this package.")
   (replace-regexp-in-string "\\\\" "\\\\\\\\" str))
 
 (defun as-sjis-byte-list-escape (lst)
-  (cond
-   ((null lst) nil)
-   ((= (car lst) 92)
-    (append (list 92 (car lst)) (as-sjis-byte-list-escape (cdr lst))))
-   (t (cons (car lst) (as-sjis-byte-list-escape (cdr lst))))))
+  (let ((esclst '()))
+    (dolist (i lst esclst)
+      (setq esclst (append esclst (list i)))
+      (if (= i 92) (setq esclst (append esclst (list i)))))))
 
 (defun as-string-to-sjis-string-with-escape (str)
   "String convert to SJIS, and escape \"\\\" "
