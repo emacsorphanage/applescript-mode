@@ -13,6 +13,7 @@
 
 ;; Author: sakito <sakito@users.sourceforge.jp>
 ;; Keywords: languages, tools
+;; Version: 0.1
 
 (defconst applescript-mode-version "$Revision$"
   "The current version of the AppleScript mode.")
