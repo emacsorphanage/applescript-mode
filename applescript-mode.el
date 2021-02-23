@@ -67,12 +67,12 @@
   :prefix "as-")
 
 (defcustom as-osascript-command "osascript"
-  "*execute AppleScripts and other OSA language scripts."
+  "Execute AppleScripts and other OSA language scripts."
   :type 'string
   :group 'applescript)
 
 (defcustom as-osacompile-command "osacompile"
-  "*compile AppleScripts and other OSA language scripts."
+  "Compile AppleScripts and other OSA language scripts."
   :type 'string
   :group 'applescript)
 
@@ -226,9 +226,7 @@ for a block opening statement are given this extra offset."
 ;; Utilities
 (defmacro as-safe (&rest body)
   "Safely execute BODY, return nil if an error occurred."
-  (` (condition-case nil
-         (progn (,@ body))
-       (error nil))))
+  `(condition-case nil (progn (,@ body)) (error nil)))
 
 (defsubst as-keep-region-active ()
   "Keep the region active in XEmacs."
@@ -277,17 +275,17 @@ contain this package.")
 
 (and (as-safe (require 'easymenu) t)
      (easy-menu-define
-      as-menu as-mode-map "AppleScript Mode menu"
-      '("AppleScript"
-        ["Comment Out Region"   comment-region (mark)]
-        ["Uncomment Region"     uncomment-region (mark)]
-        "-"
-        ["Execute buffer"       as-execute-buffer t]
-        ["Execute region"       as-execute-region (mark)]
-        ["Execute string"       as-execute-string t]
-        "-"
-        ["Mode Version"         as-mode-version t]
-        ["AppleScript Version"   as-language-version t])))
+       as-menu as-mode-map "AppleScript Mode menu"
+       '("AppleScript"
+         ["Comment Out Region"   comment-region (mark)]
+         ["Uncomment Region"     uncomment-region (mark)]
+         "-"
+         ["Execute buffer"       as-execute-buffer t]
+         ["Execute region"       as-execute-region (mark)]
+         ["Execute string"       as-execute-string t]
+         "-"
+         ["Mode Version"         as-mode-version t]
+         ["AppleScript Version"   as-language-version t])))
 
 ;;;###autoload
 (defun applescript-mode ()
@@ -343,7 +341,7 @@ contain this package.")
     (run-hooks 'applescript-mode-hook)))
 
 (when (not (or (rassq 'applescript-mode auto-mode-alist)
-  (push '("\\.applescript$" . applescript-mode) auto-mode-alist))))
+               (push '("\\.applescript$" . applescript-mode) auto-mode-alist))))
 
 ;;; Subprocess commands
 
@@ -458,8 +456,8 @@ contain this package.")
    ((string-match "\\`\\s-*\\([0-9]+\\)\\s-*\\'" retstr)
     (string-to-int (match-string 1 retstr)))
 
-    ;; else
-    (t (intern retstr))))
+   ;; else
+   (t (intern retstr))))
 
 (provide 'applescript-mode)
 ;;; applescript-mode.el ends here
