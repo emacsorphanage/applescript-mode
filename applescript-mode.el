@@ -3,6 +3,7 @@
 ;; Copyright (C) 2004  MacEmacs JP Project
 
 ;;; Credits:
+;;
 ;; Copyright (C) 2003,2004 FUJIMOTO Hisakuni
 ;;   http://www.fobj.com/~hisa/w/applescript.el.html
 ;; Copyright (C) 2003 443,435 (Public Domain?)
