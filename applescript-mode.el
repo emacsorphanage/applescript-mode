@@ -12,8 +12,10 @@
 ;;   http://www.mahalito.net/~harley/elisp/osx-osascript.el
 
 ;; Author: sakito <sakito@users.sourceforge.jp>
+;; URL: https://github.com/emacsorphanage/applescript-mode
 ;; Keywords: languages, tools
 ;; Version: 0.1
+;; Package-Requires: ((emacs "24.3"))
 
 (defconst applescript-mode-version "$Revision$"
   "The current version of the AppleScript mode.")
@@ -59,8 +61,6 @@
 
 
 ;;; Code:
-
-
 
 ;; user customize variables
 (defgroup applescript nil
