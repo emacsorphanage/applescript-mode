@@ -480,7 +480,7 @@ contain this package.")
     ;; else
     (t (intern retstr))))
 
-(defun load-and-run-applescript (path &optional tokens)
+(defun as-load-and-run-applescript (path &optional tokens)
   "Load an Applescript file, replace any tokens with values and execute"
   (interactive "fFile to load: ")
   (with-temp-buffer
@@ -504,7 +504,7 @@ contain this package.")
         (message "Applescript:\n%s" (buffer-string)))
     (do-applescript (buffer-string))))
 
-(defun decompile-scpt ()
+(defun as-decompile-scpt ()
   (if (string= (file-name-extension (buffer-file-name)) "scpt")
       (let ((cmd (concat as-osadecompile-command " " 
                          (shell-quote-argument (buffer-file-name)))))
@@ -514,7 +514,7 @@ contain this package.")
             (delete-region (point-min) (point-max))
             (insert script))))))
 
-(defun compile-scpt ()
+(defun as-compile-scpt ()
   (if (string= (file-name-extension (buffer-file-name)) "scpt")
       (let ((cmd (concat as-osacompile-command " -o " 
                          (shell-quote-argument (buffer-file-name))
@@ -526,8 +526,8 @@ contain this package.")
                 (error "Error compiling Applescript: %s" result)
               (message "Applescript compiled successfully."))))))
 
-(add-hook 'applescript-mode-hook 'decompile-scpt)
-(add-hook 'after-save-hook 'compile-scpt)
+(add-hook 'applescript-mode-hook 'as-decompile-scpt)
+(add-hook 'after-save-hook 'as-compile-scpt)
 
 (defun as-line-break ()
   "Insert the Applescript line continuation character."
