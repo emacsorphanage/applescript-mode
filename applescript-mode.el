@@ -345,6 +345,12 @@ contain this package.")
 (when (not (or (rassq 'applescript-mode auto-mode-alist)
                (push '("\\.applescript$" . applescript-mode) auto-mode-alist))))
 
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.\\(applescript\\|scpt\\)\\'" . applescript-mode))
+
+;;;###autoload
+(add-to-list 'interpreter-mode-alist '("osascript" . applescript-mode))
+
 ;;; Subprocess commands
 
 ;; function use variables
