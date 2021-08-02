@@ -5,4 +5,3 @@
 
 # applescript-mode
 > major mode for editing AppleScript source
-c
