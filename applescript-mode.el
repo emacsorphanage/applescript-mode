@@ -335,10 +335,6 @@ contain this package.")
        "\\([ \t]*\\(on\\|to\\|if\\|repeat\\|tell\\|end\\)\\|--\\)")
   (set (make-local-variable 'outline-level) 'as-outline-level)
 
-  ;; add the menu
-  (if as-menu
-      (easy-menu-add as-menu))
-
   ;; Run the mode hook.  Note that applescript-mode-hook is deprecated.
   (if applescript-mode-hook
       (run-hooks 'applescript-mode-hook)
