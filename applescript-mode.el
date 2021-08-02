@@ -110,6 +110,8 @@ for a block opening statement are given this extra offset."
   "Face for command like copy, get, set, and error.")
 (make-face 'as-command-face)
 
+(declare-function do-applescript "")
+
 (defun as-font-lock-mode-hook ()
   (or (face-differs-from-default-p 'as-pseudo-keyword-face)
       (copy-face 'font-lock-keyword-face 'as-pseudo-keyword-face))
@@ -260,8 +262,8 @@ This function does not modify point or mark."
      ((eq position 'bod) (as-beginning-of-handler 'either))
      ((eq position 'eod) (as-end-of-handler 'either))
      ;; Kind of funny, I know, but useful for as-up-exception.
-     ((eq position 'bob) (beginning-of-buffer))
-     ((eq position 'eob) (end-of-buffer))
+     ((eq position 'bob) (goto-char (point-min)))
+     ((eq position 'eob) (goto-char (point-max)))
      ((eq position 'boi) (back-to-indentation))
      ((eq position 'bos) (as-goto-initial-line))
      (t (error "Unknown buffer position requested: %s" position)))
@@ -275,7 +277,7 @@ This menu will get created automatically if you have the
 `easymenu' package.  Note that the latest X/Emacs releases
 contain this package.")
 
-(and (as-safe (require 'easymenu) t)
+(and (require 'easymenu nil t)
      (easy-menu-define
        as-menu as-mode-map "AppleScript Mode menu"
        '("AppleScript"
@@ -367,9 +369,7 @@ contain this package.")
 (defun as-execute-string (string &optional async)
   "Send the argument STRING to an AppleScript."
   (interactive "sExecute AppleScript: ")
-  (save-excursion
-    (set-buffer (get-buffer-create
-                 (generate-new-buffer-name as-output-buffer)))
+  (with-current-buffer (get-buffer-create (generate-new-buffer-name as-output-buffer))
     (insert string)
     (as-execute-region (point-min) (point-max) async)))
 
@@ -401,6 +401,9 @@ contain this package.")
   (as-keep-region-active))
 
 ;; as-beginning-of-handler, as-end-of-handler,as-goto-initial-line not yet
+(defun as-beginning-of-handler (sym) "Todo.")
+(defun as-end-of-handler (sym) "Todo.")
+(defun as-goto-initial-line () "Todo.")
 
 ;;  Support for outline.el
 (defun as-outline-level ()
@@ -462,7 +465,7 @@ contain this package.")
 
    ;; as integer
    ((string-match "\\`\\s-*\\([0-9]+\\)\\s-*\\'" retstr)
-    (string-to-int (match-string 1 retstr)))
+    (string-to-number (match-string 1 retstr)))
 
    ;; else
    (t (intern retstr))))
