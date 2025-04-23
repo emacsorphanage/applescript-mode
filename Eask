@@ -1,3 +1,5 @@
+;; -*- mode: eask; lexical-binding: t -*-
+
 (package "applescript-mode"
          "0.1"
          "major mode for editing AppleScript source")
